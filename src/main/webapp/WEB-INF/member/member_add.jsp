@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 <body>
-<%@ include file="/main/menu.jsp" %>
+<%@ include file="../main/menu.jsp" %>
 <div class="main-content">
     <div class="container mt-4" style="max-width: 500px;">
 
@@ -75,9 +75,9 @@
                                value="<%= searchCarNum %>" readonly>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" hidden="hidden">
                         <label>차량 종류 <span class="text-danger">*</span></label>
-                        <select class="form-control" name="carType" required>
+                        <select class="form-control" name="carType">
                             <option value="1">일반</option>
                             <option value="2" selected>월정액</option>
                             <option value="3">경차</option>

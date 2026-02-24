@@ -1,5 +1,9 @@
 <%@ page import="org.example.smart_parking_260219.dto.ParkingDTO" %>
 <%@ page import="org.example.smart_parking_260219.service.ParkingService" %>
+<%@ page import="java.util.Objects" %>
+<%@ page import="org.example.smart_parking_260219.dto.MemberDTO" %>
+<%@ page import="org.example.smart_parking_260219.service.MemberService" %>
+<%@ page import="java.sql.SQLException" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -8,14 +12,20 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/payment_style.css">
 </head>
 <body>
-<%@ include file="/main/menu.jsp" %>
+<%@ include file="../../main/menu.jsp" %>
 <%
     // [버그수정] Controller에서 setAttribute("parkingDTO")로 넘긴 경우 우선 사용
     // 없으면 carNum으로 직접 DB 조회 (다양한 진입 경로 대응)
     ParkingDTO parkingDTO = (ParkingDTO) request.getAttribute("parkingDTO");
+    String carNum = request.getParameter("carNum");
+    MemberDTO memberDTO;
+    try {
+        memberDTO = MemberService.INSTANCE.getOneMember(carNum);
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
 
     if (parkingDTO == null) {
-        String carNum = request.getParameter("carNum");
         if (carNum == null || carNum.isEmpty()) {
             carNum = (String) request.getAttribute("carNum");
         }
@@ -40,31 +50,27 @@
                        value="<%=parkingDTO.getSpaceId()%>" readonly>
             </div>
             <div class="form-group">
-                <label>전화 번호</label>
-                <input type="text" id="phone" placeholder="전화번호" name="phone"
-                       value="<%=(parkingDTO.getPhone() != null) ? parkingDTO.getPhone() : ""%>" readonly>
-            </div>
-            <div class="form-group">
                 <label>차량 번호</label>
                 <input type="text" id="regCarNum" placeholder="차량번호 8자리" maxlength="8" name="carNum"
                        value="<%=parkingDTO.getCarNum()%>" readonly>
             </div>
             <div class="form-group">
                 <label>차량 타입</label>
-                <input type="hidden" name="finish" value="<%=parkingDTO.getCarType()%>">
                 <div class="radio-group">
-                    <label class="radio-item">
-                        <input type="radio" value="1" <%=(parkingDTO.getCarType() == 1) ? "checked" : ""%> disabled>일반
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" value="2" <%=(parkingDTO.getCarType() == 2) ? "checked" : ""%> disabled>월정액
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" value="3" <%=(parkingDTO.getCarType() == 3) ? "checked" : ""%> disabled>경차
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" value="4" <%=(parkingDTO.getCarType() == 4) ? "checked" : ""%> disabled>장애인
-                    </label>
+                    <%
+                        // 월정액 회원인 경우
+                        if (memberDTO != null && Objects.requireNonNull(memberDTO).isSubscribed()) {
+                    %>
+                    <label class="radio-item"><input type="radio" name="carType" value="2" checked>월정액</label>
+                    <%
+                    } else {
+                    %>
+                    <label class="radio-item"><input type="radio" name="carType" value="1">일반</label>
+                    <label class="radio-item"><input type="radio" name="carType" value="3">경차</label>
+                    <label class="radio-item"><input type="radio" name="carType" value="4">장애인</label>
+                    <%
+                        }
+                    %>
                 </div>
             </div>
             <div class="form-group">
@@ -72,7 +78,7 @@
                 <input type="text" class="time" id="entryTime" placeholder="입차 시간" name="entryTime"
                        value="<%=parkingDTO.getEntryTime()%>" readonly>
             </div>
-            <button onclick="registerMember()">정산</button>
+            <button type="submit" onclick="registerMember()">정산</button>
         </form>
     </div>
 </div>

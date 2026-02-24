@@ -3,7 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   List<MemberDTO> matchedMembers = (List<MemberDTO>) request.getAttribute("matchedMembers");
-  String searchCarNum            = (String) request.getAttribute("searchCarNum");
+  String searchCarNum = (String) request.getAttribute("searchCarNum");
 
   if (matchedMembers == null || matchedMembers.isEmpty()) {
     response.sendRedirect("/member/member_search");
@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 <body>
-<%@ include file="/main/menu.jsp" %>
+<%@ include file="../main/menu.jsp" %>
 <div class="main-content">
   <div class="container mt-4" style="max-width: 600px;">
     <h2 class="mb-4">회원 선택</h2>
